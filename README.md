@@ -1,0 +1,3 @@
+# San Francisco Crime Classification - Kaggle competition
+
+Coming soon...
