@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Sfcrimeclassification-r-multinomialmodel by juandes</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Sfcrimeclassification-r-multinomialmodel</h1>
+        <p>Third attempt at the Kaggle competition &quot;San Francisco Crime Classification&quot;</p>
+
+        <p class="view"><a href="https://github.com/juandes/SFCrimeClassification-R-MultinomialModel">View the Project on GitHub <small>juandes/SFCrimeClassification-R-MultinomialModel</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/juandes/SFCrimeClassification-R-MultinomialModel/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/juandes/SFCrimeClassification-R-MultinomialModel/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/juandes/SFCrimeClassification-R-MultinomialModel">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a id="san-francisco-crime-classification-kaggle-competition-using-r-and-multinomial-logistic-regression-via-neural-networks" class="anchor" href="#san-francisco-crime-classification-kaggle-competition-using-r-and-multinomial-logistic-regression-via-neural-networks" aria-hidden="true"><span class="octicon octicon-link"></span></a>San Francisco Crime Classification (Kaggle competition) using R and multinomial logistic regression via neural networks</h1>
+
+<h2>
+<a id="overview" class="anchor" href="#overview" aria-hidden="true"><span class="octicon octicon-link"></span></a>Overview</h2>
+
+<hr>
+
+<p>The "San Francisco Crime Classification" challenge, is a <a href="https://www.kaggle.com">Kaggle</a> competition aimed to predict the category of the crimes that occurred in the city, given the time and location of the incident.</p>
+
+<p>In this post, I explain and outline my third solution to this challenge. This time using R (again).</p>
+
+<p>Link to the competition: <a href="https://www.kaggle.com/c/sf-crime">San Francisco Crime Classification</a></p>
+
+<h2>
+<a id="learning-method" class="anchor" href="#learning-method" aria-hidden="true"><span class="octicon octicon-link"></span></a>Learning method</h2>
+
+<hr>
+
+<p>The algorithm chosen for this solution, is a variation of <a href="https://en.wikipedia.org/wiki/Multinomial_logistic_regression">multinomial logistic regression</a>, a classification model based on regression where the dependent variable (what we want to predict) is categorical (opposite of continuous), implemented using <a href="https://stat.ethz.ch/R-manual/R-devel/library/nnet/html/multinom.html">neural networks</a>.</p>
+
+<h2>
+<a id="data" class="anchor" href="#data" aria-hidden="true"><span class="octicon octicon-link"></span></a>Data</h2>
+
+<hr>
+
+<p>The competition provides two dataset: a train data set and a test dataset. The
+train dataset is made of 878049 observations and the test dataset, of 884262
+observations.</p>
+
+<p>Both of them contains incidents from January 1, 2003 to May 13, 2015.</p>
+
+<h3>
+<a id="data-fields" class="anchor" href="#data-fields" aria-hidden="true"><span class="octicon octicon-link"></span></a>Data fields</h3>
+
+<ul>
+<li>Dates : timestamp of the crime incident.</li>
+<li>Category: Category of the incident. Also, this is the variable we want to predict.
+This variable is available only in the train dataset.</li>
+<li>Descript: A short description of the incident. This variable is available only 
+in the train dataset.</li>
+<li>DayOfWeek: Day of the week where the incident occurred.</li>
+<li>PdDistrict: Police Department District</li>
+<li>Resolution: Outcome of the incident. This variable is available only in the 
+train dataset.</li>
+<li>Address: Address of the incident.</li>
+<li>X: Longitude</li>
+<li>Y: Latitude</li>
+</ul>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/juandes">juandes</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
