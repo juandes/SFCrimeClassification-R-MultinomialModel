@@ -4,7 +4,7 @@ setwd("~/Development/SFCrimeClassificationAttempt3")
 train <- read.csv("~/Development/SFCrimeClassificationAttempt3/train.csv")
 test <- read.csv("~/Development/SFCrimeClassificationAttempt3/test.csv")
 
-# New dataframes with the columns to use
+# Create new dataframes with the needed columns
 train.df <- data.frame(Category = train$Category, DayOfWeek = train$DayOfWeek,
                        PdDistrict = train$PdDistrict)
 test.df <- data.frame(DayOfWeek = test$DayOfWeek, PdDistrict = test$PdDistrict)
@@ -18,8 +18,8 @@ rm(train)
 rm(test)
 
 
-# Multinomial log-linear model using the day of the week and the district of the crime
-# as the predictors.
+# Multinomial log-linear model using the day of the week,  the district of the crime
+# and the hour of the incident as the predictors.
 multinom.model <- multinom(Category ~ DayOfWeek + PdDistrict + Hour, data = train.df, 
                  maxit = 500)
 predictions <- predict(multinom.model, test.df, "probs")
