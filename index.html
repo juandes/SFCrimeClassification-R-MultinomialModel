@@ -63,6 +63,8 @@ observations.</p>
 <h3>
 <a id="data-fields" class="anchor" href="#data-fields" aria-hidden="true"><span class="octicon octicon-link"></span></a>Data fields</h3>
 
+<p>These are the features of the datasets:</p>
+
 <ul>
 <li>Dates : timestamp of the crime incident.</li>
 <li>Category: Category of the incident. Also, this is the variable we want to predict.
@@ -77,6 +79,84 @@ train dataset.</li>
 <li>X: Longitude</li>
 <li>Y: Latitude</li>
 </ul>
+
+<h2>
+<a id="model-development" class="anchor" href="#model-development" aria-hidden="true"><span class="octicon octicon-link"></span></a>Model development</h2>
+
+<hr>
+
+<h4>
+<a id="package-installation-and-data-loading" class="anchor" href="#package-installation-and-data-loading" aria-hidden="true"><span class="octicon octicon-link"></span></a>Package installation and data loading</h4>
+
+<p>For this solution, I used the <code>nnet</code> package. To install it, simply run this command in R.</p>
+
+<div class="highlight highlight-source-r"><pre>install.packages(<span class="pl-s"><span class="pl-pds">'</span>nnet<span class="pl-pds">'</span></span>)</pre></div>
+
+<p>Once the package is downloaded , the next step is calling the library, followed by setting the working directory, and loading both datasets.</p>
+
+<div class="highlight highlight-source-r"><pre>library(<span class="pl-smi">nnet</span>)
+setwd(<span class="pl-s"><span class="pl-pds">"</span>~/path/to/working/directory<span class="pl-pds">"</span></span>)
+<span class="pl-smi">train</span> <span class="pl-k">&lt;-</span> read.csv(<span class="pl-s"><span class="pl-pds">"</span>~/path/to/working/directory/train.csv<span class="pl-pds">"</span></span>)
+<span class="pl-smi">test</span> <span class="pl-k">&lt;-</span> read.csv(<span class="pl-s"><span class="pl-pds">"</span>~/path/to/working/directory/test.csv<span class="pl-pds">"</span></span>)</pre></div>
+
+<h4>
+<a id="preparing-the-dataset" class="anchor" href="#preparing-the-dataset" aria-hidden="true"><span class="octicon octicon-link"></span></a>Preparing the dataset</h4>
+
+<p>After loading the datasets, the next thing I did was creating a new dataframe with the columns needed (Category, DayOfWeek and PdDistrict), this way we can save precious memory space.</p>
+
+<div class="highlight highlight-source-r"><pre><span class="pl-c"># New dataframes</span>
+<span class="pl-smi">train.df</span> <span class="pl-k">&lt;-</span> <span class="pl-k">data.frame</span>(<span class="pl-v">Category</span> <span class="pl-k">=</span> <span class="pl-smi">train</span><span class="pl-k">$</span><span class="pl-smi">Category</span>, <span class="pl-v">DayOfWeek</span> <span class="pl-k">=</span> <span class="pl-smi">train</span><span class="pl-k">$</span><span class="pl-smi">DayOfWeek</span>,
+                       <span class="pl-v">PdDistrict</span> <span class="pl-k">=</span> <span class="pl-smi">train</span><span class="pl-k">$</span><span class="pl-smi">PdDistrict</span>)
+<span class="pl-smi">test.df</span> <span class="pl-k">&lt;-</span> <span class="pl-k">data.frame</span>(<span class="pl-v">DayOfWeek</span> <span class="pl-k">=</span> <span class="pl-smi">test</span><span class="pl-k">$</span><span class="pl-smi">DayOfWeek</span>, <span class="pl-v">PdDistrict</span> <span class="pl-k">=</span> <span class="pl-smi">test</span><span class="pl-k">$</span><span class="pl-smi">PdDistrict</span>)</pre></div>
+
+<p>The next step is to add a new feature, the hour of the incident, to both datasets. This is done by calling the function <code>strftime</code> on the original date to remove just the hour.</p>
+
+<div class="highlight highlight-source-r"><pre><span class="pl-c"># Create a new column with the hour of the incident</span>
+<span class="pl-smi">train.df</span><span class="pl-k">$</span><span class="pl-smi">Hour</span> <span class="pl-k">&lt;-</span> sapply(<span class="pl-smi">train</span><span class="pl-k">$</span><span class="pl-smi">Dates</span>, <span class="pl-k">function</span>(<span class="pl-smi">x</span>) as.integer(strftime(<span class="pl-smi">x</span>, <span class="pl-v">format</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>%H<span class="pl-pds">"</span></span>)))
+<span class="pl-smi">test.df</span><span class="pl-k">$</span><span class="pl-smi">Hour</span> <span class="pl-k">&lt;-</span> sapply(<span class="pl-smi">test</span><span class="pl-k">$</span><span class="pl-smi">Dates</span>, <span class="pl-k">function</span>(<span class="pl-smi">x</span>) as.integer(strftime(<span class="pl-smi">x</span>, <span class="pl-v">format</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>%H<span class="pl-pds">"</span></span>)))</pre></div>
+
+<p>Remove the original dataframes.</p>
+
+<div class="highlight highlight-source-r"><pre><span class="pl-c"># Remove the original dataframes</span>
+rm(<span class="pl-smi">train</span>)
+rm(<span class="pl-smi">test</span>)</pre></div>
+
+<h4>
+<a id="create-and-train-the-model" class="anchor" href="#create-and-train-the-model" aria-hidden="true"><span class="octicon octicon-link"></span></a>Create and train the model.</h4>
+
+<p>After pre-processing the data, the next step is to create and train the model. The model will predict the category of the crime using the day of the week when the incident occurred, the district where it occurred and the hour when it occurred, as the predictors.</p>
+
+<p>Instead of the default value of 100 iterations, I changed it to 500. Keep in mind the model will take some time (around 45 mins in my set up) to finish the training.</p>
+
+<div class="highlight highlight-source-r"><pre><span class="pl-c"># Multinomial log-linear model using the day of the week,  the district of the crime</span>
+<span class="pl-c"># and the hour of the incident as the predictors.</span>
+<span class="pl-smi">multinom.model</span> <span class="pl-k">&lt;-</span> multinom(<span class="pl-smi">Category</span> <span class="pl-k">~</span> <span class="pl-smi">DayOfWeek</span> <span class="pl-k">+</span> <span class="pl-smi">PdDistrict</span> <span class="pl-k">+</span> <span class="pl-smi">Hour</span>, <span class="pl-v">data</span> <span class="pl-k">=</span> <span class="pl-smi">train.df</span>, 
+                 <span class="pl-v">maxit</span> <span class="pl-k">=</span> <span class="pl-c1">500</span>)</pre></div>
+
+<h4>
+<a id="prediction-phase" class="anchor" href="#prediction-phase" aria-hidden="true"><span class="octicon octicon-link"></span></a>Prediction phase</h4>
+
+<p>Now we predict!</p>
+
+<div class="highlight highlight-source-r"><pre><span class="pl-smi">predictions</span> <span class="pl-k">&lt;-</span> predict(<span class="pl-smi">multinom.model</span>, <span class="pl-smi">test.df</span>, <span class="pl-s"><span class="pl-pds">"</span>probs<span class="pl-pds">"</span></span>)</pre></div>
+
+<h4>
+<a id="preparing-the-submission-file" class="anchor" href="#preparing-the-submission-file" aria-hidden="true"><span class="octicon octicon-link"></span></a>Preparing the submission file</h4>
+
+<p>To get a smaller file, I rounded down the number of digits.</p>
+
+<div class="highlight highlight-source-r"><pre><span class="pl-smi">submission</span> <span class="pl-k">&lt;-</span> format(<span class="pl-smi">predictions</span>, <span class="pl-v">digits</span><span class="pl-k">=</span><span class="pl-c1">4</span>, <span class="pl-v">scientific</span> <span class="pl-k">=</span> <span class="pl-c1">FALSE</span>)
+<span class="pl-smi">submission</span> <span class="pl-k">&lt;-</span> cbind(<span class="pl-v">id</span> <span class="pl-k">=</span> <span class="pl-c1">0</span><span class="pl-k">:</span><span class="pl-c1">884261</span>, <span class="pl-smi">submission</span>)
+<span class="pl-smi">submission</span> <span class="pl-k">&lt;-</span> as.data.frame(<span class="pl-smi">submission</span>)
+write.csv(<span class="pl-smi">submission</span>, <span class="pl-v">file</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>results.csv<span class="pl-pds">"</span></span>, <span class="pl-v">row.names</span> <span class="pl-k">=</span> <span class="pl-c1">FALSE</span>)</pre></div>
+
+<h2>
+<a id="conclusion" class="anchor" href="#conclusion" aria-hidden="true"><span class="octicon octicon-link"></span></a>Conclusion</h2>
+
+<hr>
+
+<p>The score received this time was way better than my previous attempts. First, I got a score of 26.74064, followed by 26.78360.
+This time my score was 2.60502, which is a huge improvement. At the moment of writing, I do not have plans on improving the score, since I would like to tackle more advanced challenges.</p>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/juandes">juandes</a></p>
